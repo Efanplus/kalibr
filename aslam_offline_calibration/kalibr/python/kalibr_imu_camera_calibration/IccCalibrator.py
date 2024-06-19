@@ -49,7 +49,7 @@ class IccCalibrator(object):
         self.CameraChain.addDesignVariables( problem, noTimeCalibration, noChainExtrinsics )
 
     def addPoseMotionTerms(self, problem, tv, rv):
-        wt = 1.0/tv;
+        wt = 1.0/tv
         wr = 1.0/rv
         W = np.diag([wt,wt,wt,wr,wr,wr])
         asp.addMotionErrorTerms(problem, self.poseDv, W, errorOrder)
@@ -108,6 +108,7 @@ class IccCalibrator(object):
         #and initial estimate for the direction of gravity
         self.CameraChain.findOrientationPriorCameraChainToImu(self.ImuList[0])
         estimatedGravity = self.CameraChain.getEstimatedGravity()
+        print("estimate gravity: ", estimatedGravity)
 
         ############################################
         ## init optimization problem

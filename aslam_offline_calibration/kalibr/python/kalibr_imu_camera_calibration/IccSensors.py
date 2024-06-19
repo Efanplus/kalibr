@@ -275,12 +275,20 @@ class IccCamera():
         
     #initialize a pose spline using camera poses (pose spline = T_wb)
     def initPoseSplineFromCamera(self, splineOrder=6, poseKnotsPerSecond=100, timeOffsetPadding=0.02):
-        T_c_b = self.T_extrinsic.T()        
+        T_c_b = self.T_extrinsic.T()
         pose = bsplines.BSplinePose(splineOrder, sm.RotationVector() )
                 
         # Get the checkerboard times.
-        times = np.array([obs.time().toSec()+self.timeshiftCamToImuPrior for obs in self.targetObservations ])                 
+        times = np.array([obs.time().toSec()+self.timeshiftCamToImuPrior for obs in self.targetObservations ])
+        # print("self.timeshiftCamToImuPrior: ", self.timeshiftCamToImuPrior)
+        # print("size: ", len(times))
+        # print("times: ", times[0])
+        # first_obs = self.targetObservations[0]
+        # print("obs: ", first_obs.T_t_c().T())          
+        # print("obs: ", np.dot(first_obs.T_t_c().T(), T_c_b))          
+        # print("obs: ", pose.transformationToCurveValue( np.dot(first_obs.T_t_c().T(), T_c_b) ))           
         curve = np.matrix([ pose.transformationToCurveValue( np.dot(obs.T_t_c().T(), T_c_b) ) for obs in self.targetObservations]).T
+        # print(__class__.__name__, "curve shape: ", curve.shape)
         
         if np.isnan(curve).any():
             raise RuntimeError("Nans in curve values")
@@ -305,7 +313,7 @@ class IccCamera():
                 if dist < best_dist:
                     best_r = aa
                     best_dist = dist
-            curve[3:6,i] = best_r;
+            curve[3:6,i] = best_r
             
         seconds = times[-1] - times[0]
         knots = int(round(seconds * poseKnotsPerSecond))
@@ -749,9 +757,9 @@ class IccImu(object):
         self.gyroErrors = gyroErrors
 
     def initBiasSplines(self, poseSpline, splineOrder, biasKnotsPerSecond):
-        start = poseSpline.t_min();
-        end = poseSpline.t_max();
-        seconds = end - start;
+        start = poseSpline.t_min()
+        end = poseSpline.t_max()
+        seconds = end - start
         knots = int(round(seconds * biasKnotsPerSecond))
         
         print("")

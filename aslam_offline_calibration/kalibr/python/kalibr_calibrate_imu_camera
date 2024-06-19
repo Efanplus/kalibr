@@ -141,12 +141,16 @@ def main():
     if  len(parsed.imu_yamls) == 1 and not parsed.imu_models:
         #Maintain backwards compatibility with previous interface.
         parsed.imu_models = ['calibrated']
+        print("only one IMU specified, assuming calibrated IMU.")
     elif len(parsed.imu_yamls) != len(parsed.imu_models):
         sm.logError("Number of IMU yamls and models has to match.")
         sys.exit(2)
-    
+
     imus = list()
     for i, (imu_yaml, imu_model) in enumerate(zip(parsed.imu_yamls, parsed.imu_models)):
+        print("  IMU {0}:".format(i))
+        print("    Model: {0}".format(imu_model))
+        print("    Yaml: {0}".format(imu_yaml))
         imuConfig = kc.ImuParameters(imu_yaml)
         imuConfig.printDetails()
         if imu_model == 'calibrated':
@@ -161,7 +165,6 @@ def main():
         else:
             sm.logError("Model {0} is currently unsupported.".format(imu_model))
             sys.exit(2)
-    
     #load calibration target configuration 
     targetConfig = kc.CalibrationTargetParameters(parsed.target_yaml)
        
@@ -171,6 +174,7 @@ def main():
     print("Initializing camera chain:")
     chain = kc.CameraChainParameters(parsed.chain_yaml)      
     chain.printDetails()   
+
     camChain = sens.IccCameraChain(chain, targetConfig, parsed)
 
     #create a calibrator instance
